@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>EBD Digital — IEADLP</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F0F4F8;--white:#FFF;--blue:#1E40AF;--blue2:#2563EB;--blue3:#3B82F6;
+  --blue-l:#EFF6FF;--navy:#0F172A;--text:#1E293B;--sub:#64748B;--border:#E2E8F0;
+  --green:#059669;--green-l:#ECFDF5;--red:#DC2626;--red-l:#FEF2F2;
+  --amber:#D97706;--amber-l:#FFFBEB;--purple:#7C3AED;--purple-l:#F5F3FF;
+  --shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);overflow:hidden}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#0F172A,#1E3A8A,#1E40AF);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:40px 32px;width:100%;max-width:380px;animation:fadeUp .4s ease}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo img{width:72px;height:72px;object-fit:contain}
+.login-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:white;text-align:center;margin-bottom:4px}
+.login-sub{font-size:.8rem;color:rgba(255,255,255,.5);text-align:center;margin-bottom:28px}
+.lf{margin-bottom:12px}
+.lf label{display:block;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.lf input{width:100%;padding:12px 16px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.92rem;color:white;outline:none;transition:border .2s}
+.lf input::placeholder{color:rgba(255,255,255,.3)}
+.lf input:focus{border-color:rgba(255,255,255,.4)}
+.login-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#2563EB,#3B82F6);color:white;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:8px;transition:all .2s;box-shadow:0 4px 20px rgba(37,99,235,.4)}
+.login-btn:hover{transform:translateY(-1px)}
+.login-err{font-size:.8rem;color:#FCA5A5;text-align:center;margin-top:10px;display:none}
+
+/* APP */
+.app{display:flex;height:100vh;overflow:hidden}
+.app.hidden{display:none}
+
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-logo img{width:34px;height:34px;object-fit:contain;flex-shrink:0}
+.sb-brand{font-family:'Syne',sans-serif;font-size:.92rem;font-weight:800;color:white;line-height:1.1}
+.sb-brand small{font-family:'DM Sans',sans-serif;font-size:.65rem;font-weight:400;color:rgba(255,255,255,.35);display:block}
+.sb-user{padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.u-role{font-size:.62rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:2px}
+.u-name{font-size:.85rem;font-weight:600;color:white}
+.u-class{font-size:.7rem;color:rgba(255,255,255,.35)}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 0}
+.sb-nav::-webkit-scrollbar{display:none}
+.nav-sec{padding:0 12px 2px;margin-top:6px}
+.nav-sec-lbl{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:0 8px;margin-bottom:3px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:all .18s;color:rgba(255,255,255,.45);font-size:.84rem;font-weight:500;margin-bottom:1px}
+.nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8)}
+.nav-item.active{background:rgba(37,99,235,.25);color:white}
+.nav-item svg{width:17px;height:17px;flex-shrink:0}
+.sb-foot{padding:12px 20px;border-top:1px solid rgba(255,255,255,.06)}
+.logout-btn{display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(255,255,255,.35);cursor:pointer;transition:color .18s;background:none;border:none;font-family:'DM Sans',sans-serif}
+.logout-btn:hover{color:#FCA5A5}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow)}
+.topbar-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text)}
+.topbar-date{font-size:.72rem;color:var(--sub);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:18px 22px 40px}
+.content::-webkit-scrollbar{width:3px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* SCREENS */
+.screen{display:none;animation:fadeUp .25s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+@media(min-width:600px){.stat-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:var(--white);border-radius:14px;padding:14px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.stat-icon svg{width:17px;height:17px}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;line-height:1;margin-bottom:2px}
+.stat-lbl{font-size:.7rem;color:var(--sub);font-weight:500}
+
+/* SEC HEADER */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:20px}
+.sec-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text)}
+.sec-sub{font-size:.72rem;color:var(--sub)}
+
+/* TABLE */
+.table-card{background:var(--white);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:14px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{padding:9px 14px;font-size:.68rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;text-align:left;background:var(--bg);border-bottom:1px solid var(--border)}
+td{padding:10px 14px;font-size:.83rem;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border:none}
+tr:hover td{background:#FAFBFC}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700}
+.bg-green{background:var(--green-l);color:var(--green)}
+.bg-red{background:var(--red-l);color:var(--red)}
+.bg-blue{background:var(--blue-l);color:var(--blue2)}
+.bg-amber{background:var(--amber-l);color:var(--amber)}
+.bg-purple{background:var(--purple-l);color:var(--purple)}
+
+/* AVATAR */
+.av{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:white;flex-shrink:0}
+
+/* RANK */
+.rk{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--sub);width:24px;text-align:center}
+.rk.gold{color:#F59E0B}.rk.silver{color:#94A3B8}.rk.bronze{color:#B45309}
+
+/* CHART */
+.chart-card{background:var(--white);border-radius:14px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px}
+.chart-title{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;margin-bottom:14px}
+
+/* CHAMADA */
+.cl-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.cl-item{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow)}
+.cl-item:hover{border-color:var(--blue2);background:var(--blue-l)}
+.cl-item.sel{border-color:var(--blue2);background:var(--blue-l)}
+.cl-dot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .18s}
+.cl-item.sel .cl-dot{background:var(--blue2)}
+.cl-name{flex:1;font-size:.88rem;font-weight:600}
+.cl-cnt{font-size:.7rem;color:var(--sub);background:var(--bg);padding:3px 9px;border-radius:20px;border:1px solid var(--border)}
+
+.al-row{display:flex;align-items:center;background:var(--white);border:1.5px solid var(--border);border-radius:11px;padding:9px 13px;margin-bottom:5px;gap:9px;transition:all .18s;box-shadow:var(--shadow)}
+.al-row.presente{border-color:#A7F3D0;background:var(--green-l)}
+.al-row.falta{border-color:#FECACA;background:var(--red-l)}
+.al-name{flex:1;font-size:.86rem;font-weight:500}
+.pg{display:flex;gap:4px}
+.pb{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:.76rem;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+.pb.p-on{background:var(--green);border-color:var(--green);color:white}
+.pb.f-on{background:var(--red);border-color:var(--red);color:white}
+
+/* DADO */
+.dado-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.dado-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:13px;box-shadow:var(--shadow)}
+.dado-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.dado-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dado-icon svg{width:13px;height:13px}
+.dado-lbl{font-size:.73rem;font-weight:600;color:var(--sub)}
+.dado-ctr{display:flex;align-items:center;justify-content:space-between}
+.dado-num{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;line-height:1}
+.cnt-btn{width:27px;height:27px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.cnt-btn:hover{border-color:var(--blue2);background:var(--blue-l);color:var(--blue2)}
+
+/* OFERTA */
+.ofc{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:13px;margin-bottom:8px;box-shadow:var(--shadow)}
+.ofb{margin-bottom:9px}
+.ofb-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.ofw{display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;overflow:hidden}
+.ofp{padding:9px 11px;font-size:.8rem;font-weight:700;border-right:1.5px solid var(--border);white-space:nowrap}
+.ofn{flex:1;padding:9px 11px;background:transparent;border:none;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;color:var(--text);outline:none;min-width:0}
+.mc{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.mc-chip{padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;color:var(--sub);cursor:pointer;transition:all .18s}
+.mc-chip:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-l)}
+
+/* FIELDS */
+.fg{margin-bottom:9px}
+.fl{display:block;font-size:.68rem;font-weight:700;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.fi{width:100%;padding:10px 13px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--text);outline:none;transition:border .2s;box-shadow:var(--shadow)}
+.fi:focus{border-color:var(--blue2)}
+.fi::placeholder{color:#C4C9D4}
+textarea.fi{resize:none;line-height:1.5}
+
+/* SAVE */
+.save-btn{width:100%;padding:13px;border-radius:12px;border:none;background:var(--blue2);color:white;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.3);transition:all .2s;margin-top:4px}
+.save-btn:hover{background:var(--blue);transform:translateY(-1px)}
+.save-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* BANNER */
+.banner{background:linear-gradient(135deg,var(--blue),var(--blue3));border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;box-shadow:0 4px 18px rgba(37,99,235,.25)}
+.banner h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:white;margin-bottom:1px}
+.banner p{font-size:.73rem;color:rgba(255,255,255,.8)}
+.banner-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:9px;padding:7px 13px;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:700;color:white;cursor:pointer;white-space:nowrap;transition:all .18s}
+.banner-btn:hover{background:rgba(255,255,255,.3)}
+
+/* BIRTHDAY */
+.bday-card{background:var(--white);border-radius:13px;padding:12px 15px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;align-items:center;gap:12px;margin-bottom:7px}
+.bday-date{text-align:center;min-width:40px}
+.bday-day{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;color:var(--blue2);line-height:1}
+.bday-month{font-size:.62rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.06em}
+.bday-name{font-size:.86rem;font-weight:600}
+.bday-class{font-size:.7rem;color:var(--sub)}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--sub)}
+.empty svg{width:36px;height:36px;stroke:var(--border);margin:0 auto 10px;display:block}
+.empty p{font-size:.82rem}
+
+/* LOADING */
+.ld-row{display:flex;align-items:center;gap:10px;padding:14px;background:var(--white);border-radius:12px;color:var(--sub);font-size:.83rem;border:1.5px solid var(--border)}
+.spinner{width:17px;height:17px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:white;padding:9px 20px;border-radius:30px;font-size:.8rem;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* MOBILE NAV */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);padding:5px 0 max(env(safe-area-inset-bottom),8px);z-index:50;box-shadow:0 -2px 10px rgba(0,0,0,.06)}
+.mn-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;background:none;border:none;cursor:pointer}
+.mn-icon{width:34px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.mn-icon svg{width:19px;height:19px;stroke:var(--sub)}
+.mn-btn.active .mn-icon{background:var(--blue-l)}
+.mn-btn.active .mn-icon svg{stroke:var(--blue2)}
+.mn-lbl{font-size:.56rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+.mn-btn.active .mn-lbl{color:var(--blue2)}
+@media(max-width:640px){
+  .sidebar{display:none}
+  .mob-nav{display:flex}
+  .content{padding:14px 14px 86px}
+  .topbar{padding:11px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo"><img src="Logo_sem_Fundo.png" alt="IEADLP"></div>
+    <div class="login-title">EBD Digital</div>
+    <div class="login-sub">Igreja Assembleia de Deus Lourival Parente</div>
+    <div class="lf"><label>Usuário</label><input type="text" id="loginUser" placeholder="Seu usuário" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lf"><label>Senha</label><input type="password" id="loginPass" placeholder="Sua senha" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-err" id="loginErr">Usuário ou senha incorretos</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app hidden" id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo"><img src="Logo_sem_Fundo.png" alt=""><div class="sb-brand">EBD Digital<small>IEADLP</small></div></div>
+    </div>
+    <div class="sb-user">
+      <div class="u-role" id="sideRole">Professor</div>
+      <div class="u-name" id="sideName">—</div>
+      <div class="u-class" id="sideClass">—</div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-sec">
+        <div class="nav-sec-lbl">Principal</div>
+        <div class="nav-item active" onclick="goTo('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+        </div>
+        <div class="nav-item" onclick="goTo('chamada')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9,11 12,14 22,4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Chamada
+        </div>
+      </div>
+      <div class="nav-sec" id="adminNav">
+        <div class="nav-sec-lbl">Administração</div>
+        <div class="nav-item" onclick="goTo('ranking')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>Ranking
+        </div>
+        <div class="nav-item" onclick="goTo('aniversarios')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Aniversários
+        </div>
+        <div class="nav-item" onclick="goTo('financeiro')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+        </div>
+      </div>
+    </div>
+    <div class="sb-foot">
+      <button class="logout-btn" onclick="doLogout()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topTitle">Dashboard</span>
+      <span class="topbar-date" id="topDate"></span>
+    </div>
+    <div class="content" id="mainContent">
+
+      <!-- DASHBOARD -->
+      <div class="screen active" id="s-dashboard">
+        <div class="stat-grid" id="dashStats"></div>
+        <div class="sec-hd"><span class="sec-title">Resumo das Classes</span></div>
+        <div class="table-card"><div class="tw"><table>
+          <thead><tr><th>Classe</th><th>Alunos</th><th>Status</th></tr></thead>
+          <tbody id="dashTable"></tbody>
+        </table></div></div>
+      </div>
+
+      <!-- CHAMADA -->
+      <div class="screen" id="s-chamada">
+        <div id="step1">
+          <div class="fg"><label class="fl">Professor(a)</label><input class="fi" id="profInput" placeholder="Nome do professor(a)"></div>
+          <div class="fg" style="margin-bottom:14px"><label class="fl">Tema / Lição</label><input class="fi" id="temaInput" placeholder="Tema ou lição de hoje"></div>
+          <div style="font-size:.68rem;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px">Classe</div>
+          <div class="cl-list" id="classeList"><div class="ld-row"><div class="spinner"></div><span>Carregando...</span></div></div>
+          <div id="bannerWrap" style="display:none">
+            <div class="banner"><div><h3 id="bannerName">—</h3><p id="bannerCount">—</p></div><button class="banner-btn" onclick="goStep2()">Fazer chamada</button></div>
+          </div>
+        </div>
+        <div id="step2" style="display:none">
+          <button onclick="goStep1()" style="background:none;border:none;color:var(--sub);font-family:'DM Sans',sans-serif;font-size:.83rem;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;gap:4px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>Voltar
+          </button>
+          <div id="chamadaList" style="margin-bottom:12px"></div>
+          <div style="font-size:.68rem;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:8px">Dados da aula<span style="flex:1;height:1px;background:var(--border)"></span></div>
+          <div class="dado-grid">
+            <div class="dado-card">
+              <div class="dado-top"><div class="dado-icon" style="background:var(--blue-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><span class="dado-lbl">Bíblias</span></div>
+              <div class="dado-ctr"><button class="cnt-btn" onclick="adj('biblias',-1)">−</button><span class="dado-num" style="color:var(--blue2)" id="nBiblias">0</span><button class="cnt-btn" onclick="adj('biblias',1)">+</button></div>
+            </div>
+            <div class="dado-card">
+              <div class="dado-top"><div class="dado-icon" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div><span class="dado-lbl">Revistas</span></div>
+              <div class="dado-ctr"><button class="cnt-btn" onclick="adj('revistas',-1)">−</button><span class="dado-num" style="color:var(--green)" id="nRevistas">0</span><button class="cnt-btn" onclick="adj('revistas',1)">+</button></div>
+            </div>
+            <div class="dado-card">
+              <div class="dado-top"><div class="dado-icon" style="background:var(--purple-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><span class="dado-lbl">Conversões</span></div>
+              <div class="dado-ctr"><button class="cnt-btn" onclick="adj('conversoes',-1)">−</button><span class="dado-num" style="color:var(--purple)" id="nConversoes">0</span><button class="cnt-btn" onclick="adj('conversoes',1)">+</button></div>
+            </div>
+            <div class="dado-card">
+              <div class="dado-top"><div class="dado-icon" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="dado-lbl">Visitantes</span></div>
+              <div class="dado-ctr"><button class="cnt-btn" onclick="adj('visitantes',-1)">−</button><span class="dado-num" style="color:var(--green)" id="nVisitantes">0</span><button class="cnt-btn" onclick="adj('visitantes',1)">+</button></div>
+            </div>
+          </div>
+          <div class="ofc">
+            <div style="font-size:.73rem;font-weight:700;color:var(--sub);margin-bottom:9px">Oferta</div>
+            <div class="ofb">
+              <div class="ofb-lbl" style="color:var(--amber)">Dinheiro</div>
+              <div class="ofw"><span class="ofp" style="color:var(--amber);background:var(--amber-l)">R$</span><input class="ofn" id="ofertaDin" type="number" min="0" step="0.01" placeholder="0,00" oninput="updOf('din')"></div>
+              <div class="mc">
+                <button class="mc-chip" onclick="addM('din',100)">100</button><button class="mc-chip" onclick="addM('din',50)">50</button><button class="mc-chip" onclick="addM('din',20)">20</button><button class="mc-chip" onclick="addM('din',10)">10</button><button class="mc-chip" onclick="addM('din',5)">5</button><button class="mc-chip" onclick="addM('din',2)">2</button><button class="mc-chip" onclick="addM('din',1)">1</button><button class="mc-chip" onclick="addM('din',0.50)">0,50</button>
+              </div>
+            </div>
+            <div class="ofb" style="margin-bottom:0">
+              <div class="ofb-lbl" style="color:var(--purple)">PIX</div>
+              <div class="ofw" style="border-color:rgba(124,58,237,.2)"><span class="ofp" style="color:var(--purple);background:var(--purple-l);border-color:rgba(124,58,237,.15)">R$</span><input class="ofn" id="ofertaPix" type="number" min="0" step="0.01" placeholder="0,00" oninput="updOf('pix')"></div>
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:12px"><label class="fl">Observações</label><textarea class="fi" id="obsInput" rows="2" placeholder="Observações (opcional)"></textarea></div>
+          <button class="save-btn" id="saveBtn" onclick="salvar()"><span id="saveTxt">Salvar e Enviar</span></button>
+        </div>
+      </div>
+
+      <!-- RANKING -->
+      <div class="screen" id="s-ranking">
+        <div class="sec-hd"><span class="sec-title">Ranking por Classe</span><span class="sec-sub">Frequência acumulada</span></div>
+        <div id="rankClasse"></div>
+        <div class="sec-hd"><span class="sec-title">Ranking Geral</span></div>
+        <div class="table-card"><div class="tw"><table>
+          <thead><tr><th>#</th><th>Aluno</th><th>Classe</th><th>Presenças</th></tr></thead>
+          <tbody id="rankGeral"></tbody>
+        </table></div></div>
+      </div>
+
+      <!-- ANIVERSÁRIOS -->
+      <div class="screen" id="s-aniversarios">
+        <div class="sec-hd"><span class="sec-title">Aniversariantes do Mês</span><span class="sec-sub" id="bdayMes"></span></div>
+        <div id="bdayList"></div>
+        <div class="sec-hd"><span class="sec-title">Próximos Aniversários</span></div>
+        <div id="bdayProx"></div>
+      </div>
+
+      <!-- FINANCEIRO -->
+      <div class="screen" id="s-financeiro">
+        <div class="stat-grid" id="finStats"></div>
+        <div class="chart-card"><div class="chart-title">Evolução das Ofertas</div><div style="position:relative;height:190px"><canvas id="chartOf"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Dinheiro vs PIX</div><div style="position:relative;height:190px"><canvas id="chartPie"></canvas></div></div>
+        <div class="sec-hd"><span class="sec-title">Oferta por Classe</span></div>
+        <div class="table-card"><div class="tw"><table>
+          <thead><tr><th>Classe</th><th>Dinheiro</th><th>PIX</th><th>Total</th></tr></thead>
+          <tbody id="finTable"></tbody>
+        </table></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MOBILE NAV -->
+  <div class="mob-nav" id="mobNav">
+    <button class="mn-btn" id="mn-dashboard" onclick="goTo('dashboard')"><div class="mn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><span class="mn-lbl">Início</span></button>
+    <button class="mn-btn active" id="mn-chamada" onclick="goTo('chamada')"><div class="mn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="9,11 12,14 22,4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span class="mn-lbl">Chamada</span></button>
+    <button class="mn-btn prof-only" id="mn-aniversarios" onclick="goTo('aniversarios')"><div class="mn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="mn-lbl">Aniversários</span></button>
+    <button class="mn-btn admin-only" id="mn-ranking" onclick="goTo('ranking')"><div class="mn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/></svg></div><span class="mn-lbl">Ranking</span></button>
+    <button class="mn-btn admin-only" id="mn-financeiro" onclick="goTo('financeiro')"><div class="mn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span class="mn-lbl">Financeiro</span></button>
+    <button class="mn-btn" onclick="doLogout()"><div class="mn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div><span class="mn-lbl">Sair</span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const APPS_URL='https://script.google.com/macros/s/AKfycbxkesIxuM06ONcMx-ONpjiF7QVFdLkmbJNSNthskuHM7IcrciLkKo1quv8BJxYm28Q/exec';
+
+// USUÁRIOS — altere as senhas conforme necessário
+const USERS={
+  'admin':        {pass:'ebd2026',    role:'admin',    name:'Administrador',      classe:null},
+  'bereanos':     {pass:'ber2026',    role:'professor',name:'Prof. Bereanos',      classe:'Bereanos'},
+  'daniel':       {pass:'dan2026',    role:'professor',name:'Prof. Daniel',        classe:'Daniel - Senhores'},
+  'debora':       {pass:'deb2026',    role:'professor',name:'Prof. Débora',        classe:'Débora/Dorcas'},
+  'ester':        {pass:'est2026',    role:'professor',name:'Prof. Ester',         classe:'Ester'},
+  'juvenis':      {pass:'juv2026',    role:'professor',name:'Prof. Juvenis',       classe:'Juvenis'},
+  'estrela':      {pass:'estr2026',   role:'professor',name:'Prof. Estrela',       classe:'Estrela da Manhã'},
+  'juniores':     {pass:'jun2026',    role:'professor',name:'Prof. Juniores',      classe:'Juniores'},
+  'cordeirinhos': {pass:'cor2026',    role:'professor',name:'Prof. Cordeirinhos',  classe:'Cordeirinhos de Cristo'},
+  'maternal':     {pass:'mat2026',    role:'professor',name:'Prof. Maternal',      classe:'Maternal'},
+  'obreiros':     {pass:'obr2026',    role:'professor',name:'Prof. Obreiros',      classe:'Obreiros'},
+};
+
+const CORES=['#2563EB','#0891B2','#059669','#D97706','#7C3AED','#0D9488','#9333EA','#B45309','#0369A1','#065F46'];
+const now=new Date();
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+let currentUser=null,allClasses={},alunos=[],selClass=null;
+
+// Auto-login se tiver sessão salva
+(function(){
+  const saved = localStorage.getItem('ebd_session');
+  if(saved){
+    try{
+      const u = JSON.parse(saved);
+      if(USERS[u.username] && USERS[u.username].pass === u.pass){
+        currentUser = {...USERS[u.username], username: u.username};
+        document.getElementById('loginScreen').style.display='none';
+        document.getElementById('app').classList.remove('hidden');
+        setupUser();
+        carregarClasses();
+      }
+    }catch(e){ localStorage.removeItem('ebd_session'); }
+  }
+})();
+let cnt={biblias:0,revistas:0,conversoes:0,visitantes:0};
+let oferta={din:0,pix:0};
+let chOf=null,chPie=null;
+
+document.getElementById('topDate').textContent=
+  now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+
+// ── LOGIN
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim().toLowerCase();
+  const p=document.getElementById('loginPass').value.trim();
+  const err=document.getElementById('loginErr');
+  if(USERS[u]&&USERS[u].pass===p){
+    currentUser={...USERS[u],username:u};
+    // Salva sessão no navegador
+    localStorage.setItem('ebd_session', JSON.stringify({username:u, pass:p}));
+    err.style.display='none';
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').classList.remove('hidden');
+    setupUser();
+    carregarClasses();
+  } else { err.style.display='block'; }
+}
+function doLogout(){
+  currentUser=null;
+  localStorage.removeItem('ebd_session');
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+function setupUser(){
+  document.getElementById('sideName').textContent=currentUser.name;
+  document.getElementById('sideRole').textContent=currentUser.role==='admin'?'Administrador':'Professor';
+  document.getElementById('sideClass').textContent=currentUser.classe||'Todas as classes';
+  if(currentUser.role!=='admin'){
+    document.getElementById('adminNav').style.display='none';
+    document.querySelectorAll('.admin-only').forEach(el=>el.style.display='none');
+    // Show aniversarios for professors
+    document.getElementById('mn-aniversarios').style.display='flex';
+    // Professor starts on chamada screen
+    setTimeout(()=>goTo('chamada'), 100);
+  } else {
+    // Admin: hide prof-only items
+    document.querySelectorAll('.prof-only').forEach(el=>el.style.display='none');
+  }
+}
+
+// ── NAVIGATION
+function goTo(scr){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.mn-btn').forEach(n=>n.classList.remove('active'));
+  document.getElementById('s-'+scr).classList.add('active');
+  document.querySelector('.nav-item[onclick="goTo(\''+scr+'\')"]')?.classList.add('active');
+  document.getElementById('mn-'+scr)?.classList.add('active');
+  const titles={dashboard:'Dashboard',chamada:'Chamada',ranking:'Ranking',aniversarios:'Aniversários',financeiro:'Financeiro'};
+  document.getElementById('topTitle').textContent=titles[scr]||scr;
+  document.getElementById('mainContent').scrollTop=0;
+  if(scr==='dashboard')    loadDash();
+  if(scr==='ranking')      loadRanking();
+  if(scr==='aniversarios') loadBdays();
+  if(scr==='financeiro')   loadFin();
+}
+
+// ── JSONP
+function carregarClasses(){
+  const cb='ebdCb_'+Date.now();
+  const timer=setTimeout(()=>{
+    delete window[cb];
+    document.getElementById('classeList').innerHTML='<div class="ld-row" style="border-color:#FECACA;color:var(--red)">Erro ao carregar classes.</div>';
+  },10000);
+  window[cb]=function(data){
+    clearTimeout(timer);delete window[cb];
+    document.getElementById('jsonpScript')?.remove();
+    allClasses=data;
+    renderClasses();loadDash();
+  };
+  const s=document.createElement('script');
+  s.id='jsonpScript';s.src=APPS_URL+'?callback='+cb;
+  document.body.appendChild(s);
+}
+
+function renderClasses(){
+  const list=document.getElementById('classeList');list.innerHTML='';
+  const classes=currentUser.role==='admin'
+    ?Object.keys(allClasses)
+    :Object.keys(allClasses).filter(c=>c===currentUser.classe);
+  classes.forEach((nome,i)=>{
+    const count=(allClasses[nome]||[]).length;
+    const item=document.createElement('div');
+    item.className='cl-item';
+    item.innerHTML=`<div class="cl-dot"></div><span class="cl-name">${nome}</span><span class="cl-cnt">${count} alunos</span>`;
+    item.onclick=()=>selectClass(nome,item,CORES[i%CORES.length]);
+    list.appendChild(item);
+  });
+  if(currentUser.role==='professor'&&currentUser.classe){
+    list.querySelector('.cl-item')?.click();
+  }
+}
+
+function selectClass(nome,el,cor){
+  document.querySelectorAll('.cl-item').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+  selClass={nome,cor};
+  const lista=allClasses[nome]||[];
+  alunos=lista.map((n,i)=>({id:i,nome:n,presente:null}));
+  document.getElementById('bannerWrap').style.display='block';
+  document.getElementById('bannerName').textContent=nome;
+  document.getElementById('bannerCount').textContent=lista.length+' alunos cadastrados';
+  renderChamada();
+}
+
+function goStep2(){document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block';document.getElementById('mainContent').scrollTop=0;}
+function goStep1(){document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';}
+
+// ── CHAMADA
+function renderChamada(){
+  const list=document.getElementById('chamadaList');list.innerHTML='';
+  alunos.forEach((a,i)=>{
+    const init=a.nome.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+    const cor=CORES[i%CORES.length];
+    const row=document.createElement('div');
+    row.className='al-row'+(a.presente===true?' presente':a.presente===false?' falta':'');
+    row.innerHTML=`<div class="av" style="background:${cor}">${init}</div><span class="al-name">${a.nome}</span><div class="pg"><button class="pb${a.presente===true?' p-on':''}" onclick="setPres(${a.id},true)">P</button><button class="pb${a.presente===false?' f-on':''}" onclick="setPres(${a.id},false)">F</button></div>`;
+    list.appendChild(row);
+  });
+}
+function setPres(id,val){const a=alunos.find(x=>x.id===id);if(a){a.presente=a.presente===val?null:val;renderChamada();}}
+function adj(k,d){cnt[k]=Math.max(0,(cnt[k]||0)+d);document.getElementById('n'+k.charAt(0).toUpperCase()+k.slice(1)).textContent=cnt[k];}
+function addM(t,v){oferta[t]=Math.round((oferta[t]+v)*100)/100;document.getElementById('oferta'+t.charAt(0).toUpperCase()+t.slice(1)).value=oferta[t].toFixed(2);}
+function updOf(t){oferta[t]=parseFloat(document.getElementById('oferta'+t.charAt(0).toUpperCase()+t.slice(1)).value||'0')||0;}
+
+async function salvar(){
+  if(!selClass){showToast('Selecione uma classe!');return;}
+  const nm=alunos.filter(a=>a.presente===null);
+  if(nm.length>0){showToast('Marque P ou F para: '+nm.map(a=>a.nome.split(' ')[0]).join(', '));return;}
+  const btn=document.getElementById('saveBtn'),txt=document.getElementById('saveTxt');
+  btn.disabled=true;txt.textContent='Enviando...';
+  const payload={
+    classe:selClass.nome,
+    alunos:alunos.map(a=>({nome:a.nome,status:a.presente===true?'Presente':'Falta'})),
+    visitantes:cnt.visitantes,biblias:cnt.biblias,revistas:cnt.revistas,
+    dinheiro:oferta.din.toFixed(2),pix:oferta.pix.toFixed(2),
+    conversoes:cnt.conversoes,observacoes:document.getElementById('obsInput').value.trim()
+  };
+  try{
+    await fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    btn.disabled=false;txt.textContent='Salvar e Enviar';
+    showToast('Chamada enviada com sucesso!');
+    alunos.forEach(a=>a.presente=null);
+    cnt={biblias:0,revistas:0,conversoes:0,visitantes:0};
+    oferta={din:0,pix:0};
+    ['nBiblias','nRevistas','nConversoes','nVisitantes'].forEach(id=>document.getElementById(id).textContent='0');
+    document.getElementById('ofertaDin').value='';
+    document.getElementById('ofertaPix').value='';
+    document.getElementById('obsInput').value='';
+    renderChamada();goStep1();
+  }catch(e){btn.disabled=false;txt.textContent='Salvar e Enviar';showToast('Erro ao enviar.');}
+}
+
+// ── DASHBOARD
+function loadDash(){
+  if(!Object.keys(allClasses).length)return;
+  const total=Object.values(allClasses).reduce((s,a)=>s+a.length,0);
+  const classes=Object.keys(allClasses).length;
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card"><div class="stat-icon" style="background:var(--blue-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-num" style="color:var(--blue2)">${total}</div><div class="stat-lbl">Total de Alunos</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><div class="stat-num" style="color:var(--green)">${classes}</div><div class="stat-lbl">Classes Ativas</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--amber-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-num" style="color:var(--amber)">${now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</div><div class="stat-lbl">Data de Hoje</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--purple-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="stat-num" style="color:var(--purple)">${MESES[now.getMonth()].slice(0,3).toUpperCase()}</div><div class="stat-lbl">${MESES[now.getMonth()]}</div></div>`;
+  document.getElementById('dashTable').innerHTML=Object.entries(allClasses).map(([nome,lista],i)=>`
+    <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:${CORES[i%CORES.length]};font-size:.6rem">${nome.slice(0,2).toUpperCase()}</div>${nome}</div></td>
+    <td><span class="badge bg-blue">${lista.length} alunos</span></td>
+    <td><span class="badge bg-green">Ativa</span></td></tr>`).join('');
+}
+
+// ── RANKING
+function loadRanking(){
+  const rc=document.getElementById('rankClasse');rc.innerHTML='';
+  Object.keys(allClasses).forEach((classe,ci)=>{
+    const lista=allClasses[classe];if(!lista.length)return;
+    const card=document.createElement('div');
+    card.className='table-card';card.style.marginBottom='12px';
+    card.innerHTML=`<div style="padding:11px 15px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:.83rem;font-weight:800">${classe}</div>
+    <div style="padding:12px 15px">${lista.slice(0,5).map((nome,i)=>`
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
+        <span class="rk ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</span>
+        <div class="av" style="background:${CORES[ci%CORES.length]};width:26px;height:26px;font-size:.6rem">${nome.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase()}</div>
+        <span style="flex:1;font-size:.83rem;font-weight:500">${nome}</span>
+        <span class="badge bg-blue">—</span>
+      </div>`).join('')}</div>`;
+    rc.appendChild(card);
+  });
+  const all=[];
+  Object.entries(allClasses).forEach(([c,l])=>l.forEach(n=>all.push({nome:n,classe:c})));
+  document.getElementById('rankGeral').innerHTML=all.slice(0,15).map((a,i)=>`
+    <tr><td><span class="rk ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</span></td>
+    <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="background:${CORES[i%CORES.length]};width:26px;height:26px;font-size:.6rem">${a.nome.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase()}</div>${a.nome}</div></td>
+    <td><span class="badge bg-blue">${a.classe}</span></td><td>—</td></tr>`).join('');
+}
+
+// ── ANIVERSÁRIOS
+function loadBdays(){
+  const mes=now.getMonth()+1;
+  document.getElementById('bdayMes').textContent=MESES[mes-1];
+  document.getElementById('bdayList').innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><p>Cadastre as datas de nascimento na coluna C da aba Alunos<br>para ver os aniversariantes aqui.</p></div>`;
+  document.getElementById('bdayProx').innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p>Os próximos aniversários aparecerão aqui<br>após o cadastro das datas.</p></div>`;
+}
+
+// ── FINANCEIRO
+function loadFin(){
+  document.getElementById('finStats').innerHTML=`
+    <div class="stat-card"><div class="stat-icon" style="background:var(--amber-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-num" style="color:var(--amber)">R$ —</div><div class="stat-lbl">Total Dinheiro</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--purple-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div class="stat-num" style="color:var(--purple)">R$ —</div><div class="stat-lbl">Total PIX</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--green-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/></svg></div><div class="stat-num" style="color:var(--green)">R$ —</div><div class="stat-lbl">Total Geral</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--blue-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-num" style="color:var(--blue2)">—</div><div class="stat-lbl">Domingos</div></div>`;
+
+  if(chOf)chOf.destroy();if(chPie)chPie.destroy();
+  chOf=new Chart(document.getElementById('chartOf').getContext('2d'),{
+    type:'line',data:{labels:['Sem dados ainda'],datasets:[{label:'Total',data:[0],borderColor:'#2563EB',backgroundColor:'rgba(37,99,235,.1)',fill:true,tension:.4,pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v}}}}
+  });
+  chPie=new Chart(document.getElementById('chartPie').getContext('2d'),{
+    type:'doughnut',data:{labels:['Dinheiro','PIX'],datasets:[{data:[50,50],backgroundColor:['#D97706','#7C3AED'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'65%'}
+  });
+  document.getElementById('finTable').innerHTML=Object.keys(allClasses).map(c=>`
+    <tr><td><span class="badge bg-blue">${c}</span></td><td style="color:var(--amber);font-weight:600">R$ 0,00</td><td style="color:var(--purple);font-weight:600">R$ 0,00</td><td style="font-weight:700">R$ 0,00</td></tr>`).join('');
+}
+
+// ── TOAST
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+</script>
+</body>
+</html>

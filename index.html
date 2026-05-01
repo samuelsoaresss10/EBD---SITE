@@ -180,11 +180,13 @@ textarea.fi{resize:none;line-height:1.5}
 .save-btn:hover{background:var(--blue);transform:translateY(-1px)}
 .save-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
-.banner{background:linear-gradient(135deg,var(--blue),var(--blue3));border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;box-shadow:0 4px 16px rgba(37,99,235,.25)}
+.banner{background:linear-gradient(135deg,var(--blue),var(--blue3));border-radius:14px;padding:11px 16px;display:flex;align-items:center;justify-content:center;margin-bottom:0;box-shadow:0 4px 16px rgba(37,99,235,.25);min-height:46px}
 .banner h3{font-size:.95rem;font-weight:800;color:white;margin-bottom:1px}
 .banner p{font-size:.73rem;color:rgba(255,255,255,.8);font-weight:500}
-.banner-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:9px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;color:white;cursor:pointer;white-space:nowrap;transition:all .18s}
-.banner-btn:hover{background:rgba(255,255,255,.3)}
+.banner-wrap-inner{border-radius:14px;overflow:hidden;margin-bottom:13px}
+.banner-btn{width:100%;padding:13px;border:none;border-radius:0 0 14px 14px;background:linear-gradient(135deg,#D97706,#F59E0B);color:white;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;transition:all .18s;box-shadow:0 4px 14px rgba(217,119,6,.35);display:flex;align-items:center;justify-content:center;gap:8px}
+.banner-btn:hover{background:linear-gradient(135deg,#B45309,#D97706);transform:none}
+.banner-btn svg{width:16px;height:16px}
 
 .bday-card{background:var(--white);border-radius:12px;padding:11px 14px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;align-items:center;gap:11px;margin-bottom:6px}
 .bday-date{text-align:center;min-width:38px}
@@ -219,7 +221,7 @@ textarea.fi{resize:none;line-height:1.5}
   .topbar{display:none}
   .mob-topbar{display:flex}
   .mob-nav{display:flex}
-  .content{padding:14px 14px 82px}
+  .content{padding:14px 14px 110px}
 }
 </style>
 </head>
@@ -328,7 +330,13 @@ textarea.fi{resize:none;line-height:1.5}
           <div style="font-size:.68rem;font-weight:800;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Classe</div>
           <div class="cl-list" id="classeList"><div class="ld-row"><div class="spinner"></div><span>Carregando...</span></div></div>
           <div id="bannerWrap" style="display:none">
-            <div class="banner"><div><h3 id="bannerName">—</h3><p id="bannerCount">—</p></div><button class="banner-btn" onclick="goStep2()">Fazer chamada</button></div>
+            <div class="banner-wrap-inner">
+              <div class="banner"><span id="bannerCount" style="font-size:.82rem;font-weight:700;color:rgba(255,255,255,.88)">—</span></div>
+              <button class="banner-btn" onclick="goStep2()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,11 12,14 22,4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Fazer Chamada
+              </button>
+            </div>
           </div>
         </div>
         <div id="step2" style="display:none">
@@ -546,8 +554,7 @@ function selectClass(nome,el,cor){
   const lista=allClasses[nome]||[];
   alunos=lista.map((a,i)=>({id:i,nome:typeof a==='object'?a.nome:a,presente:null}));
   document.getElementById('bannerWrap').style.display='block';
-  document.getElementById('bannerName').textContent=nome;
-  document.getElementById('bannerCount').textContent=lista.length+' alunos cadastrados';
+  document.getElementById('bannerCount').textContent=nome+' · '+lista.length+' alunos cadastrados';
   renderChamada();
 }
 

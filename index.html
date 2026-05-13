@@ -192,7 +192,7 @@ tr:hover td{background:#F8FAFF}
 textarea.fi{resize:none;line-height:1.5}
 
 /* ── SAVE BTN ── */
-.save-btn{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#1A5CFF,#00C896);color:white;font-family:'Nunito Sans',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(26,92,255,.35);transition:all .2s}
+.save-btn{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#1A5CFF,#00C896);color:white;font-family:'Nunito Sans',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(26,92,255,.35);transition:all .2s;position:sticky;bottom:8px}
 .save-btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* ── BANNER CHAMADA (botão fazer chamada) ── */
@@ -217,7 +217,6 @@ textarea.fi{resize:none;line-height:1.5}
 .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.save-btn-fixed{display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom) + 68px);left:12px;right:12px;z-index:49;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#1A5CFF,#00C896);color:white;font-family:'Nunito Sans',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(26,92,255,.45);align-items:center;justify-content:center}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:white;padding:10px 22px;border-radius:30px;font-size:.82rem;font-weight:700;opacity:0;pointer-events:none;transition:all .25s;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -236,9 +235,7 @@ textarea.fi{resize:none;line-height:1.5}
   .topbar{display:none}
   .mob-topbar{display:flex}
   .mob-nav{display:flex}
-  .content{padding:14px 14px 160px}
-  .save-btn{display:none}
-  .save-btn-fixed{display:flex !important}
+  .content{padding:14px 14px 80px}
 }
 </style>
 </head>
@@ -406,7 +403,6 @@ textarea.fi{resize:none;line-height:1.5}
 
           <div class="fg" style="margin-bottom:6px"><label class="fl">Observações</label><textarea class="fi" id="obsInput" rows="1" placeholder="Observações (opcional)" style="min-height:44px;padding:10px 14px;"></textarea></div>
           <button class="save-btn" id="saveBtn" onclick="salvar()"><span id="saveTxt">Salvar e Enviar</span></button>
-          <button class="save-btn-fixed" id="saveBtnFixed" onclick="salvar()"><span id="saveTxtFixed">Salvar e Enviar</span></button>
         </div>
       </div>
 
@@ -631,18 +627,18 @@ async function salvar(){
   const nm=alunos.filter(a=>a.presente===null);
   if(nm.length>0){showToast('Marque P ou F para: '+nm.map(a=>a.nome.split(' ')[0]).join(', '));return;}
   const btn=document.getElementById('saveBtn'),txt=document.getElementById('saveTxt');
-  btn.disabled=true;txt.textContent='Enviando...';const btnF=document.getElementById('saveBtnFixed');const txtF=document.getElementById('saveTxtFixed');if(btnF){btnF.disabled=true;txtF.textContent='Enviando...';}
+  btn.disabled=true;txt.textContent='Enviando...';
   const payload={classe:selClass.nome,alunos:alunos.map(a=>({nome:a.nome,status:a.presente===true?'Presente':'Falta'})),visitantes:cnt.visitantes,biblias:cnt.biblias,revistas:cnt.revistas,dinheiro:oferta.din.toFixed(2),pix:oferta.pix.toFixed(2),conversoes:cnt.conversoes,observacoes:document.getElementById('obsInput').value.trim()};
   try{
     await fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    btn.disabled=false;txt.textContent='Salvar e Enviar';if(btnF){btnF.disabled=false;txtF.textContent='Salvar e Enviar';}
+    btn.disabled=false;txt.textContent='Salvar e Enviar';
     showToast('✅ Chamada enviada com sucesso!');
     alunos.forEach(a=>a.presente=null);cnt={biblias:0,revistas:0,conversoes:0,visitantes:0};oferta={din:0,pix:0};
     ['nBiblias','nRevistas','nConversoes','nVisitantes'].forEach(id=>{const el=document.getElementById(id);if(el.tagName==='INPUT')el.value='';else el.textContent='0';});
     document.getElementById('ofertaDin').value='';document.getElementById('ofertaPix').value='';document.getElementById('obsInput').value='';
     renderChamada();goStep1();
     jsonp('ebd',d=>{ebdData=d;});jsonp('presenca',d=>{presencaData=d;});
-  }catch(e){btn.disabled=false;txt.textContent='Salvar e Enviar';if(btnF){btnF.disabled=false;txtF.textContent='Salvar e Enviar';}showToast('Erro ao enviar.');}
+  }catch(e){btn.disabled=false;txt.textContent='Salvar e Enviar';showToast('Erro ao enviar.');}
 }
 
 function loadDash(){

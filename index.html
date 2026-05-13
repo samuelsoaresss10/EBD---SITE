@@ -192,7 +192,7 @@ tr:hover td{background:#F8FAFF}
 textarea.fi{resize:none;line-height:1.5}
 
 /* ── SAVE BTN ── */
-.save-btn{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#1A5CFF,#00C896);color:white;font-family:'Nunito Sans',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(26,92,255,.35);transition:all .2s;margin-top:6px}
+.save-btn{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#1A5CFF,#00C896);color:white;font-family:'Nunito Sans',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(26,92,255,.35);transition:all .2s;margin-top:1px}
 .save-btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* ── BANNER CHAMADA (botão fazer chamada) ── */
@@ -225,9 +225,9 @@ textarea.fi{resize:none;line-height:1.5}
 .mn-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;background:none;border:none;cursor:pointer}
 .mn-icon{width:34px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .mn-icon svg{width:20px;height:20px;transition:all .15s}
-.mn-btn.active .mn-icon{background:rgba(26,92,255,.12)}
+.mn-btn.active .mn-icon{background:linear-gradient(135deg,#0A2878,#1A5CFF)}
 .mn-lbl{font-size:.57rem;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;transition:color .15s}
-.mn-btn.active .mn-lbl{color:var(--blue2)}
+.mn-btn.active .mn-lbl{color:#1A5CFF;font-weight:800}
 
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
@@ -365,11 +365,11 @@ textarea.fi{resize:none;line-height:1.5}
               <div class="dado-grid">
                 <div class="dado-card">
                   <div class="dado-top"><div class="dado-icon" style="background:#EBF0FF"><svg viewBox="0 0 24 24" fill="none" stroke="#0A2878" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><span class="dado-lbl">Bíblias</span></div>
-                  <div class="dado-ctr"><button class="cnt-btn" onclick="adj('biblias',-1)">−</button><span class="dado-num" style="color:#0A2878" id="nBiblias">0</span><button class="cnt-btn" onclick="adj('biblias',1)">+</button></div>
+                  <input type="number" min="0" id="nBiblias" placeholder="0" oninput="cnt.biblias=parseInt(this.value)||0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito Sans',sans-serif;font-size:1.4rem;font-weight:900;color:#0A2878;text-align:center;background:var(--bg);outline:none;-moz-appearance:textfield" />
                 </div>
                 <div class="dado-card">
                   <div class="dado-top"><div class="dado-icon" style="background:#E6FAF5"><svg viewBox="0 0 24 24" fill="none" stroke="#00A87A" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div><span class="dado-lbl">Revistas</span></div>
-                  <div class="dado-ctr"><button class="cnt-btn" onclick="adj('revistas',-1)">−</button><span class="dado-num" style="color:#00A87A" id="nRevistas">0</span><button class="cnt-btn" onclick="adj('revistas',1)">+</button></div>
+                  <input type="number" min="0" id="nRevistas" placeholder="0" oninput="cnt.revistas=parseInt(this.value)||0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito Sans',sans-serif;font-size:1.4rem;font-weight:900;color:#00A87A;text-align:center;background:var(--bg);outline:none;-moz-appearance:textfield" />
                 </div>
               </div>
             </div>
@@ -382,11 +382,11 @@ textarea.fi{resize:none;line-height:1.5}
               <div class="dado-grid">
                 <div class="dado-card">
                   <div class="dado-top"><div class="dado-icon" style="background:#EDE9FE"><svg viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><span class="dado-lbl">Conversões</span></div>
-                  <div class="dado-ctr"><button class="cnt-btn" onclick="adj('conversoes',-1)">−</button><span class="dado-num" style="color:#6D28D9" id="nConversoes">0</span><button class="cnt-btn" onclick="adj('conversoes',1)">+</button></div>
+                  <input type="number" min="0" id="nConversoes" placeholder="0" oninput="cnt.conversoes=parseInt(this.value)||0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito Sans',sans-serif;font-size:1.4rem;font-weight:900;color:#6D28D9;text-align:center;background:var(--bg);outline:none;-moz-appearance:textfield" />
                 </div>
                 <div class="dado-card">
                   <div class="dado-top"><div class="dado-icon" style="background:#E6FAF5"><svg viewBox="0 0 24 24" fill="none" stroke="#00A87A" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="dado-lbl">Visitantes</span></div>
-                  <div class="dado-ctr"><button class="cnt-btn" onclick="adj('visitantes',-1)">−</button><span class="dado-num" style="color:#00A87A" id="nVisitantes">0</span><button class="cnt-btn" onclick="adj('visitantes',1)">+</button></div>
+                  <input type="number" min="0" id="nVisitantes" placeholder="0" oninput="cnt.visitantes=parseInt(this.value)||0" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito Sans',sans-serif;font-size:1.4rem;font-weight:900;color:#00A87A;text-align:center;background:var(--bg);outline:none;-moz-appearance:textfield" />
                 </div>
               </div>
             </div>
@@ -499,7 +499,7 @@ function buildMobNav(){
   items.forEach(item=>{
     const btn=document.createElement('button');
     btn.className='mn-btn';btn.id='mn-'+item.id;
-    btn.innerHTML=`<div class="mn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="${item.cor}" stroke-width="2" stroke-linecap="round">${item.svg}</svg></div><span class="mn-lbl" style="color:${item.cor}88">${item.lbl}</span>`;
+    const isActive=false;btn.innerHTML=`<div class="mn-icon" id="mni-${item.id}"><svg viewBox="0 0 24 24" fill="none" stroke="${item.cor}" stroke-width="2" stroke-linecap="round" id="mnsvg-${item.id}">${item.svg}</svg></div><span class="mn-lbl">${item.lbl}</span>`;
     btn.onclick=()=>goTo(item.id);
     nav.appendChild(btn);
   });
@@ -618,7 +618,7 @@ function renderChamada(){
 }
 
 function setPres(id,val){const a=alunos.find(x=>x.id===id);if(a){a.presente=a.presente===val?null:val;renderChamada();}}
-function adj(k,d){cnt[k]=Math.max(0,(cnt[k]||0)+d);document.getElementById('n'+k.charAt(0).toUpperCase()+k.slice(1)).textContent=cnt[k];}
+function adj(k,d){/* substituído por inputs diretos */}
 function addM(t,v){oferta[t]=Math.round((oferta[t]+v)*100)/100;document.getElementById('oferta'+t.charAt(0).toUpperCase()+t.slice(1)).value=oferta[t].toFixed(2);}
 function updOf(t){oferta[t]=parseFloat(document.getElementById('oferta'+t.charAt(0).toUpperCase()+t.slice(1)).value||'0')||0;}
 
@@ -634,7 +634,7 @@ async function salvar(){
     btn.disabled=false;txt.textContent='Salvar e Enviar';
     showToast('✅ Chamada enviada com sucesso!');
     alunos.forEach(a=>a.presente=null);cnt={biblias:0,revistas:0,conversoes:0,visitantes:0};oferta={din:0,pix:0};
-    ['nBiblias','nRevistas','nConversoes','nVisitantes'].forEach(id=>document.getElementById(id).textContent='0');
+    ['nBiblias','nRevistas','nConversoes','nVisitantes'].forEach(id=>{const el=document.getElementById(id);if(el.tagName==='INPUT')el.value='';else el.textContent='0';});
     document.getElementById('ofertaDin').value='';document.getElementById('ofertaPix').value='';document.getElementById('obsInput').value='';
     renderChamada();goStep1();
     jsonp('ebd',d=>{ebdData=d;});jsonp('presenca',d=>{presencaData=d;});

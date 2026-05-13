@@ -191,8 +191,8 @@ tr:hover td{background:#F8FAFF}
 .fi::placeholder{color:#B0BAD0}
 textarea.fi{resize:none;line-height:1.5}
 
-/* ── SAVE BTN ── */
-.save-btn{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#1A5CFF,#00C896);color:white;font-family:'Nunito Sans',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(26,92,255,.35);transition:all .2s;position:sticky;bottom:72px}
+/* ── SAVE BTN — igual ao original, sem sticky ── */
+.save-btn{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#1A5CFF,#00C896);color:white;font-family:'Nunito Sans',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(26,92,255,.35);transition:all .2s;margin-top:4px}
 .save-btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* ── BANNER CHAMADA (botão fazer chamada) ── */
@@ -235,7 +235,8 @@ textarea.fi{resize:none;line-height:1.5}
   .topbar{display:none}
   .mob-topbar{display:flex}
   .mob-nav{display:flex}
-  .content{padding:14px 14px 100px}
+  /* padding-bottom generoso para não cortar conteúdo atrás da nav bar */
+  .content{padding:14px 14px 130px}
 }
 </style>
 </head>
@@ -401,7 +402,7 @@ textarea.fi{resize:none;line-height:1.5}
             </div>
           </div>
 
-          <div class="fg" style="margin-bottom:4px"><label class="fl">Observações</label><textarea class="fi" id="obsInput" rows="1" placeholder="Observações (opcional)" style="min-height:44px;padding:10px 14px;"></textarea></div>
+          <div class="fg" style="margin-bottom:12px"><label class="fl">Observações</label><textarea class="fi" id="obsInput" rows="1" placeholder="Observações (opcional)" style="min-height:44px;padding:10px 14px;"></textarea></div>
           <button class="save-btn" id="saveBtn" onclick="salvar()"><span id="saveTxt">Salvar e Enviar</span></button>
         </div>
       </div>
@@ -499,7 +500,7 @@ function buildMobNav(){
   items.forEach(item=>{
     const btn=document.createElement('button');
     btn.className='mn-btn';btn.id='mn-'+item.id;
-    const isActive=false;btn.innerHTML=`<div class="mn-icon" id="mni-${item.id}"><svg viewBox="0 0 24 24" fill="none" stroke="${item.cor}" stroke-width="2" stroke-linecap="round" id="mnsvg-${item.id}">${item.svg}</svg></div><span class="mn-lbl">${item.lbl}</span>`;
+    btn.innerHTML=`<div class="mn-icon" id="mni-${item.id}"><svg viewBox="0 0 24 24" fill="none" stroke="${item.cor}" stroke-width="2" stroke-linecap="round" id="mnsvg-${item.id}">${item.svg}</svg></div><span class="mn-lbl">${item.lbl}</span>`;
     btn.onclick=()=>goTo(item.id);
     nav.appendChild(btn);
   });

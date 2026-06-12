@@ -507,6 +507,11 @@ function normalizarData(d){
   if(m) return String(m[1]).padStart(2,'0')+'/'+String(m[2]).padStart(2,'0')+'/'+m[3];
   m=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);              // dd/mm/aa
   if(m) return String(m[1]).padStart(2,'0')+'/'+String(m[2]).padStart(2,'0')+'/20'+m[3];
+  // fallback: deixa o JS interpretar — cobre "Sun May 03 2026 00:00:00 GMT-0300 (...)"
+  const dt=new Date(d);
+  if(!isNaN(dt.getTime())){
+    return String(dt.getDate()).padStart(2,'0')+'/'+String(dt.getMonth()+1).padStart(2,'0')+'/'+dt.getFullYear();
+  }
   return d;
 }
 function hojeStr(){

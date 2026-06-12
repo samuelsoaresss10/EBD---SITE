@@ -493,6 +493,8 @@ let cnt={biblias:0,revistas:0,conversoes:0,visitantes:0};
 let oferta={din:0,pix:0};
 let chOf=null,chPie=null;
 let ebdData=[],presencaData=[];
+// chaves "classe||dd/mm/aaaa" enviadas nesta sessão — não some quando o ebdData recarrega
+let enviadasSessao=new Set();
 
 document.getElementById('topDate').textContent=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
 
@@ -521,6 +523,9 @@ function hojeStr(){
 // Retorna true se a classe já tem registro na data de hoje
 function chamadaJaEnviada(classe){
   const hj=hojeStr();
+  // 1) registrada nesta sessão (resistente ao atraso de propagação do Apps Script)
+  if(enviadasSessao.has(classe+'||'+hj)) return true;
+  // 2) já existe na planilha
   return ebdData.some(r=>r.classe===classe && normalizarData(r.data)===hj);
 }
 
@@ -704,9 +709,8 @@ async function salvar(){
   const btn=document.getElementById('saveBtn'),txt=document.getElementById('saveTxt');
   btn.disabled=true;txt.textContent='Enviando...';
   const payload={classe:selClass.nome,alunos:alunos.map(a=>({nome:a.nome,status:a.presente===true?'Presente':'Falta'})),visitantes:cnt.visitantes,biblias:cnt.biblias,revistas:cnt.revistas,dinheiro:oferta.din.toFixed(2),pix:oferta.pix.toFixed(2),conversoes:cnt.conversoes,observacoes:document.getElementById('obsInput').value.trim()};
-  // marca localmente como enviada já, para impedir clique-duplo enquanto recarrega
-  const classeEnviada=selClass.nome;
-  ebdData.push({classe:classeEnviada,data:hojeStr()});
+  // marca como enviada nesta sessão ANTES do envio — bloqueio imediato e à prova do atraso da planilha
+  enviadasSessao.add(selClass.nome+'||'+hojeStr());
   try{
     await fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     btn.disabled=false;txt.textContent='Salvar e Enviar';
